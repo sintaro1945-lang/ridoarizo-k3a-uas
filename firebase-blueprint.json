@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Employee or Admin user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 255 },
+        "displayName": { "type": "string", "maxLength": 100 },
+        "role": { "type": "string", "enum": ["admin", "employee"] },
+        "positionId": { "type": "string", "maxLength": 128 },
+        "dailyRate": { "type": "number" },
+        "phone": { "type": "string", "maxLength": 30 },
+        "joinedDate": { "type": "string", "maxLength": 50 },
+        "avatarUrl": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["uid", "email", "displayName", "role"]
+    },
+    "Position": {
+      "title": "Position",
+      "description": "Job position and department",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 100 },
+        "department": { "type": "string", "maxLength": 100 },
+        "baseDailyRate": { "type": "number" }
+      },
+      "required": ["id", "title", "department", "baseDailyRate"]
+    },
+    "WorkSetting": {
+      "title": "WorkSetting",
+      "description": "Working hours and schedule rules",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "workStart": { "type": "string", "maxLength": 10 },
+        "workEnd": { "type": "string", "maxLength": 10 },
+        "lateToleranceMinutes": { "type": "number" },
+        "workDays": { "type": "string", "maxLength": 100 }
+      },
+      "required": ["id", "workStart", "workEnd"]
+    },
+    "Attendance": {
+      "title": "Attendance",
+      "description": "Employee attendance record with selfie and clock in/out",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "userName": { "type": "string", "maxLength": 100 },
+        "date": { "type": "string", "maxLength": 20 },
+        "clockInTime": { "type": "string", "maxLength": 30 },
+        "clockInSelfieUrl": { "type": "string", "maxLength": 2000 },
+        "clockInLocation": { "type": "string", "maxLength": 200 },
+        "clockOutTime": { "type": "string", "maxLength": 30 },
+        "clockOutSelfieUrl": { "type": "string", "maxLength": 2000 },
+        "status": { "type": "string", "enum": ["Present", "Late", "Absent", "Early Leave"] },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["id", "userId", "date", "status"]
+    },
+    "Payroll": {
+      "title": "Payroll",
+      "description": "Monthly calculated payroll summary for employee",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "month": { "type": "string", "maxLength": 20 },
+        "totalDaysPresent": { "type": "number" },
+        "dailyRate": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["Draft", "Paid"] },
+        "generatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "userId", "month", "totalDaysPresent", "dailyRate", "totalAmount", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and roles"
+    },
+    "/positions/{positionId}": {
+      "schema": "Position",
+      "description": "Job positions"
+    },
+    "/work_settings/{settingId}": {
+      "schema": "WorkSetting",
+      "description": "Working hours settings"
+    },
+    "/attendance/{attendanceId}": {
+      "schema": "Attendance",
+      "description": "Daily attendance records"
+    },
+    "/payrolls/{payrollId}": {
+      "schema": "Payroll",
+      "description": "Monthly calculated payrolls"
+    }
+  }
+}

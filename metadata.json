@@ -1,0 +1,6 @@
+{
+  "name": "AbsensiGo HRM & Presensi PWA",
+  "description": "Aplikasi Human Resource Management lengkap dengan panel Backoffice Admin dan Mobile PWA presensi karyawan berbasis selfie & gaji harian.",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
