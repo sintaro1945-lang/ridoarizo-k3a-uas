@@ -6,7 +6,7 @@ import { UserProfile, Position, WorkSetting, AttendanceRecord, PayrollRecord } f
 import AuthScreen from './components/AuthScreen';
 import AdminBackoffice from './components/AdminBackoffice';
 import EmployeePWA from './components/EmployeePWA';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Monitor, Smartphone } from 'lucide-react';
 
 export default function App() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -20,24 +20,10 @@ export default function App() {
   const [attendanceList, setAttendanceList] = useState<AttendanceRecord[]>([]);
   const [payrolls, setPayrolls] = useState<PayrollRecord[]>([]);
 
-  // View mode switcher for admins ('admin' vs 'pwa')
+  // View mode switcher: 'admin' (Back Office Management) vs 'pwa' (Mobile-First Employee App)
   const [adminViewMode, setAdminViewMode] = useState<'admin' | 'pwa'>('admin');
 
-  // Logout handler supporting both Firebase Auth and Demo localStorage
-  const handleLogout = async () => {
-    localStorage.removeItem('absensigo_demo_user');
-    try {
-      await auth.signOut();
-    } catch (err) {
-      console.error(err);
-    }
-    setFirebaseUser(null);
-    setCurrentUserProfile(null);
-    window.location.reload();
-  };
-
   useEffect(() => {
-    // Check demo user in localStorage first
     const demoUserStr = localStorage.getItem('absensigo_demo_user');
     if (demoUserStr) {
       try {
@@ -161,8 +147,8 @@ export default function App() {
   if (loadingAuth) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white">
-        <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-        <p className="text-slate-400 text-sm">Memuat AbsensiGo HRM...</p>
+        <Loader2 className="w-10 h-10 text-amber-500 animate-spin mb-4" />
+        <p className="text-slate-400 text-sm">Memuat AbsensiGo Gold...</p>
       </div>
     );
   }
@@ -171,26 +157,54 @@ export default function App() {
     return <AuthScreen />;
   }
 
-  if (currentUserProfile.role === 'admin' && adminViewMode === 'admin') {
-    return (
-      <AdminBackoffice
-        currentUser={currentUserProfile}
-        users={users}
-        positions={positions}
-        workSetting={workSetting}
-        attendanceList={attendanceList}
-        payrolls={payrolls}
-        onSwitchToEmployeePWA={() => setAdminViewMode('pwa')}
-      />
-    );
-  }
-
   return (
-    <EmployeePWA
-      currentUser={currentUserProfile}
-      positions={positions}
-      workSetting={workSetting}
-      onSwitchToAdmin={currentUserProfile.role === 'admin' ? () => setAdminViewMode('admin') : undefined}
-    />
+    <div className="min-h-screen bg-slate-950 flex flex-col">
+      {/* Floating Pill Mode Switcher Bar matching user screenshot */}
+      <div className="bg-slate-900/90 backdrop-blur-xl border-b border-slate-800 py-2.5 px-4 flex justify-center sticky top-0 z-50">
+        <div className="bg-slate-950 p-1 rounded-full border border-slate-800 flex items-center max-w-md w-full shadow-2xl">
+          <button
+            onClick={() => setAdminViewMode('admin')}
+            className={`flex-1 py-2.5 px-4 rounded-full text-xs font-black flex items-center justify-center gap-2 transition-all ${
+              adminViewMode === 'admin'
+                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Monitor className="w-4 h-4" /> Back Office Management
+          </button>
+          <button
+            onClick={() => setAdminViewMode('pwa')}
+            className={`flex-1 py-2.5 px-4 rounded-full text-xs font-black flex items-center justify-center gap-2 transition-all ${
+              adminViewMode === 'pwa'
+                ? 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 shadow-lg shadow-amber-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Smartphone className="w-4 h-4" /> Mobile-First Employee App
+          </button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col">
+        {adminViewMode === 'admin' ? (
+          <AdminBackoffice
+            currentUser={currentUserProfile}
+            users={users}
+            positions={positions}
+            workSetting={workSetting}
+            attendanceList={attendanceList}
+            payrolls={payrolls}
+            onSwitchToEmployeePWA={() => setAdminViewMode('pwa')}
+          />
+        ) : (
+          <EmployeePWA
+            currentUser={currentUserProfile}
+            positions={positions}
+            workSetting={workSetting}
+            onSwitchToAdmin={currentUserProfile.role === 'admin' ? () => setAdminViewMode('admin') : undefined}
+          />
+        )}
+      </div>
+    </div>
   );
 }

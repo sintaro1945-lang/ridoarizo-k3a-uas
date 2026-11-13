@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { AttendanceRecord, UserProfile } from '../types';
 import { Clock, Calendar, MapPin, User, Search, Eye, X } from 'lucide-react';
+import { formatDateDDMMMYYYY } from '../utils/dateFormatter';
 
 interface AttendanceManagementProps {
   attendanceList: AttendanceRecord[];
@@ -23,7 +24,7 @@ export default function AttendanceManagement({ attendanceList, users }: Attendan
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold">Data Kehadiran Karyawan</h2>
-          <p className="text-sm text-slate-400">Pantau presensi harian, jam masuk, jam pulang, dan foto selfie karyawan.</p>
+          <p className="text-sm text-slate-400">Pantau presensi harian, jam masuk, jam pulang, koordinat GPS, dan foto selfie karyawan.</p>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto">
@@ -50,11 +51,11 @@ export default function AttendanceManagement({ attendanceList, users }: Attendan
             <thead>
               <tr className="border-b border-slate-800 text-xs text-slate-400 bg-slate-950/50 uppercase tracking-wider">
                 <th className="p-4">Karyawan</th>
-                <th className="p-4">Tanggal</th>
+                <th className="p-4">Tanggal (DD-MMM-YYYY)</th>
                 <th className="p-4">Clock-In</th>
                 <th className="p-4">Clock-Out</th>
                 <th className="p-4">Status</th>
-                <th className="p-4">Lokasi</th>
+                <th className="p-4">Lokasi GPS</th>
                 <th className="p-4 text-right">Foto Selfie</th>
               </tr>
             </thead>
@@ -71,7 +72,7 @@ export default function AttendanceManagement({ attendanceList, users }: Attendan
                   return (
                     <tr key={item.id} className="hover:bg-white/[0.02] transition-colors">
                       <td className="p-4 font-bold">{emp?.displayName || item.userName || 'Karyawan'}</td>
-                      <td className="p-4 text-slate-300">{item.date}</td>
+                      <td className="p-4 font-semibold text-white">{formatDateDDMMMYYYY(item.date)}</td>
                       <td className="p-4 font-mono text-blue-400">{item.clockInTime || '-'}</td>
                       <td className="p-4 font-mono text-indigo-400">{item.clockOutTime || '-'}</td>
                       <td className="p-4">
@@ -87,9 +88,8 @@ export default function AttendanceManagement({ attendanceList, users }: Attendan
                           {item.status}
                         </span>
                       </td>
-                      <td className="p-4 text-slate-400 text-xs flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-blue-400" />
-                        {item.clockInLocation || 'Kantor'}
+                      <td className="p-4 text-slate-400 text-xs font-mono max-w-xs truncate">
+                        {item.clockInLocation || item.clockOutLocation || 'Kantor'}
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2">
@@ -120,7 +120,6 @@ export default function AttendanceManagement({ attendanceList, users }: Attendan
         </div>
       </div>
 
-      {/* Photo Modal */}
       {activePhoto && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl p-4 text-white">

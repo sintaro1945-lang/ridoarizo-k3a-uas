@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db, OperationType, handleFirestoreError } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { Shield, Smartphone, Users, Clock, Award, AlertTriangle } from 'lucide-react';
+import { Shield, Smartphone, Users, Clock, Award, AlertTriangle, Sparkles, CheckCircle2 } from 'lucide-react';
 import { UserProfile } from '../types';
 
 export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDomainHelp, setShowDomainHelp] = useState(false);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
-    setShowDomainHelp(false);
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
@@ -40,8 +38,7 @@ export default function AuthScreen() {
     } catch (err: any) {
       console.error(err);
       if (err.code === 'auth/unauthorized-domain' || err.message?.includes('unauthorized-domain')) {
-        setShowDomainHelp(true);
-        setError('Domain preview saat ini belum diotorisasi di Firebase Console.');
+        setError('Domain preview belum diotorisasi di Firebase Console. Gunakan Akses Instan di bawah.');
       } else {
         setError(err.message || 'Gagal melakukan login dengan Google.');
       }
@@ -55,8 +52,8 @@ export default function AuthScreen() {
     setError(null);
     try {
       const demoUid = role === 'admin' ? 'demo_admin_123' : 'demo_employee_456';
-      const demoEmail = role === 'admin' ? 'sintaro1945@gmail.com' : 'karyawan@absensigo.com';
-      const demoName = role === 'admin' ? 'Administrator (Demo)' : 'Budi Karyawan (Demo)';
+      const demoEmail = role === 'admin' ? 'sintaro1945@gmail.com' : 'karyawan@absenese.com';
+      const demoName = role === 'admin' ? 'Administrator (Back Office)' : 'John Doe (Employee App)';
 
       const userRef = doc(db, 'users', demoUid);
       const userSnap = await getDoc(userRef).catch(() => null);
@@ -86,48 +83,47 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-blue-950 flex flex-col justify-center items-center p-4">
-      <div className="max-w-md w-full bg-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-white/20 text-white">
+    <div className="min-h-screen bg-[#0b1021] flex flex-col justify-center items-center p-4 selection:bg-amber-500 selection:text-slate-950 font-sans">
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-md w-full bg-slate-900/90 backdrop-blur-2xl rounded-[36px] p-8 shadow-2xl border border-amber-500/30 text-white relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-2xl shadow-lg mb-4 ring-4 ring-blue-500/30">
-            <Clock className="w-10 h-10 text-white animate-pulse" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-tr from-amber-500 to-yellow-400 rounded-3xl shadow-xl shadow-amber-500/30 mb-4 text-slate-950 font-black text-3xl">
+            ⚡
           </div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-400 to-indigo-200 bg-clip-text text-transparent">
-            AbsensiGo HRM
+          <h1 className="text-3xl font-black tracking-tight bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent">
+            AbsenEase Gold
           </h1>
-          <p className="text-slate-300 text-sm mt-2">
-            Sistem Manajemen HR Profesional & Presensi PWA Karyawan dengan Selfie & Gaji Harian
+          <p className="text-slate-400 text-xs mt-2 font-medium">
+            Sistem Manajemen HR & Presensi PWA Profesional dengan GPS & Gaji Harian
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/40 rounded-xl text-red-200 text-sm space-y-2">
+          <div className="mb-6 p-4 bg-amber-500/15 border border-amber-500/30 rounded-2xl text-amber-200 text-xs space-y-1">
             <div className="flex items-center gap-2 font-bold">
-              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
               <span>{error}</span>
             </div>
-            {showDomainHelp && (
-              <p className="text-xs text-slate-300 leading-relaxed pt-1 border-t border-red-500/30">
-                <strong>Catatan:</strong> Domain preview cloud run Anda belum terdaftar di Authorized Domains Firebase Console. Gunakan <strong>Masuk Admin</strong> atau <strong>Masuk Karyawan</strong> di bawah untuk menguji aplikasi secara instan tanpa kendala.
-              </p>
-            )}
+            <p className="text-[11px] text-slate-300">Gunakan tombol Akses Instan di bawah untuk pengujian cepat.</p>
           </div>
         )}
 
-        <div className="space-y-4 mb-8">
-          <div className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-            <Smartphone className="w-5 h-5 text-blue-400 mt-0.5 shrink-0" />
+        <div className="space-y-3 mb-8">
+          <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-2xl border border-white/10">
+            <Smartphone className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
             <div>
-              <h3 className="text-sm font-semibold text-white">PWA Mobile Karyawan</h3>
-              <p className="text-xs text-slate-300">Clock-In & Clock-Out dengan verifikasi foto selfie & lokasi GPS.</p>
+              <h3 className="text-xs font-bold text-white">Mobile-First Employee App</h3>
+              <p className="text-[11px] text-slate-400">Clock-In & Clock-Out dengan verifikasi foto selfie & GPS.</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-            <Shield className="w-5 h-5 text-indigo-400 mt-0.5 shrink-0" />
+          <div className="flex items-start gap-3 p-3.5 bg-white/5 rounded-2xl border border-white/10">
+            <Shield className="w-5 h-5 text-amber-400 mt-0.5 shrink-0" />
             <div>
-              <h3 className="text-sm font-semibold text-white">Backoffice Admin</h3>
-              <p className="text-xs text-slate-300">Kelola data karyawan, jabatan, shift kerja, dan rekapitulasi kehadiran.</p>
+              <h3 className="text-xs font-bold text-white">Back Office Management</h3>
+              <p className="text-[11px] text-slate-400">Kelola karyawan, jabatan, jam kerja, dan rekap payroll.</p>
             </div>
           </div>
         </div>
@@ -136,7 +132,7 @@ export default function AuthScreen() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full py-4 px-6 bg-white hover:bg-slate-100 text-slate-900 font-bold rounded-2xl shadow-xl transition-all duration-200 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50"
+            className="w-full py-4 px-6 bg-white hover:bg-slate-100 text-slate-950 font-bold rounded-2xl shadow-xl transition-all duration-200 flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50 text-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -160,16 +156,16 @@ export default function AuthScreen() {
           </button>
 
           <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-white/20"></div>
-            <span className="flex-shrink mx-4 text-xs text-slate-400">Atau Akses Instan (Rekomendasi Preview)</span>
-            <div className="flex-grow border-t border-white/20"></div>
+            <div className="flex-grow border-t border-white/10"></div>
+            <span className="flex-shrink mx-4 text-[11px] text-slate-400 font-medium">Akses Instan (Demo Mode)</span>
+            <div className="flex-grow border-t border-white/10"></div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => handleDemoLogin('admin')}
               disabled={loading}
-              className="py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all"
+              className="py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 transition-all"
             >
               <Shield className="w-4 h-4" /> Masuk Admin
             </button>
@@ -177,7 +173,7 @@ export default function AuthScreen() {
             <button
               onClick={() => handleDemoLogin('employee')}
               disabled={loading}
-              className="py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition-all"
+              className="py-3 px-4 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 transition-all"
             >
               <Users className="w-4 h-4" /> Masuk Karyawan
             </button>
