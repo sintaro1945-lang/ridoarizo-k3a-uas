@@ -6,7 +6,7 @@ import { UserProfile, Position, WorkSetting, AttendanceRecord, PayrollRecord } f
 import AuthScreen from './components/AuthScreen';
 import AdminBackoffice from './components/AdminBackoffice';
 import EmployeePWA from './components/EmployeePWA';
-import { Clock, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function App() {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
@@ -23,18 +23,43 @@ export default function App() {
   // View mode switcher for admins ('admin' vs 'pwa')
   const [adminViewMode, setAdminViewMode] = useState<'admin' | 'pwa'>('admin');
 
+  // Logout handler supporting both Firebase Auth and Demo localStorage
+  const handleLogout = async () => {
+    localStorage.removeItem('absensigo_demo_user');
+    try {
+      await auth.signOut();
+    } catch (err) {
+      console.error(err);
+    }
+    setFirebaseUser(null);
+    setCurrentUserProfile(null);
+    window.location.reload();
+  };
+
   useEffect(() => {
+    // Check demo user in localStorage first
+    const demoUserStr = localStorage.getItem('absensigo_demo_user');
+    if (demoUserStr) {
+      try {
+        const demoProfile = JSON.parse(demoUserStr) as UserProfile;
+        setCurrentUserProfile(demoProfile);
+        setFirebaseUser({ uid: demoProfile.uid, email: demoProfile.email } as any);
+        setLoadingAuth(false);
+        return;
+      } catch (e) {
+        localStorage.removeItem('absensigo_demo_user');
+      }
+    }
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (user) {
-        // Fetch user profile from Firestore
         const userRef = doc(db, 'users', user.uid);
         try {
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setCurrentUserProfile(userSnap.data() as UserProfile);
           } else {
-            // Create default profile if not exists
             const isAdmin = user.email === 'sintaro1945@gmail.com' || user.email?.includes('admin');
             const defaultProfile: UserProfile = {
               uid: user.uid,
@@ -70,7 +95,6 @@ export default function App() {
         const list: UserProfile[] = [];
         snap.forEach((d) => list.push(d.data() as UserProfile));
         setUsers(list);
-        // Update current user profile if changed
         const current = list.find((u) => u.uid === firebaseUser.uid);
         if (current) setCurrentUserProfile(current);
       },
@@ -93,7 +117,6 @@ export default function App() {
         if (snap.exists()) {
           setWorkSetting(snap.data() as WorkSetting);
         } else {
-          // Default setting
           setWorkSetting({
             id: 'default_setting',
             workStart: '08:00',
@@ -148,7 +171,6 @@ export default function App() {
     return <AuthScreen />;
   }
 
-  // If user is admin and in admin view mode
   if (currentUserProfile.role === 'admin' && adminViewMode === 'admin') {
     return (
       <AdminBackoffice
@@ -163,7 +185,6 @@ export default function App() {
     );
   }
 
-  // Employee PWA view (or admin switching to pwa view)
   return (
     <EmployeePWA
       currentUser={currentUserProfile}

@@ -196,7 +196,11 @@ export default function EmployeePWA({ currentUser, positions, workSetting, onSwi
             </button>
           )}
           <button
-            onClick={() => auth.signOut()}
+            onClick={() => {
+              localStorage.removeItem('absensigo_demo_user');
+              auth.signOut();
+              window.location.reload();
+            }}
             className="p-2 hover:bg-slate-800 rounded-xl text-slate-400 hover:text-red-400 transition-colors"
             title="Keluar"
           >

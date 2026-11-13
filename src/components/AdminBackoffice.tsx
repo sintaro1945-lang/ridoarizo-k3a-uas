@@ -130,7 +130,11 @@ export default function AdminBackoffice({
           </button>
 
           <button
-            onClick={() => auth.signOut()}
+            onClick={() => {
+              localStorage.removeItem('absensigo_demo_user');
+              auth.signOut();
+              window.location.reload();
+            }}
             className="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-2xl text-xs flex items-center justify-center gap-2 transition-all"
           >
             <LogOut className="w-4 h-4" /> Keluar
@@ -155,7 +159,14 @@ export default function AdminBackoffice({
             >
               <Smartphone className="w-4 h-4" /> PWA
             </button>
-            <button onClick={() => auth.signOut()} className="p-2 bg-slate-800 rounded-xl text-slate-400 hover:text-white">
+            <button
+              onClick={() => {
+                localStorage.removeItem('absensigo_demo_user');
+                auth.signOut();
+                window.location.reload();
+              }}
+              className="p-2 bg-slate-800 rounded-xl text-slate-400 hover:text-white"
+            >
               <LogOut className="w-4 h-4" />
             </button>
           </div>
